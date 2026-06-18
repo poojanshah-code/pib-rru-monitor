@@ -1,0 +1,27 @@
+name: PIB RRU Monitor
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # runs every 30 minutes
+  workflow_dispatch:          # lets you trigger manually from GitHub UI
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install feedparser
+
+      - name: Run monitor
+        env:
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        run: python monitor.py
