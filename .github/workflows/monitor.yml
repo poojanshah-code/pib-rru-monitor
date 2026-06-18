@@ -2,17 +2,17 @@ name: PIB RRU Monitor
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # runs every 30 minutes
-  workflow_dispatch:          # lets you trigger manually from GitHub UI
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.11"
 
@@ -25,3 +25,12 @@ jobs:
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
         run: python monitor.py
+
+      - name: Keep repo active
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          echo "Last run: $(date)" > last_run.txt
+          git add last_run.txt
+          git commit -m "chore: keep alive $(date)" || echo "Nothing to commit"
+          git push
